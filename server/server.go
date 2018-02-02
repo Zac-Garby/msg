@@ -96,6 +96,7 @@ func (s *Server) HandleMessages() {
 
 		case "chat":
 			if !msg.sender.sentInfo {
+				log.Println("a client tried to send a message, but hadn't sent client info beforehand")
 				break
 			}
 
