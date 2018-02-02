@@ -103,6 +103,22 @@ func (s *Server) HandleMessages() {
 				break
 			}
 
+			if strings.HasPrefix(str, "/script") {
+				lines := strings.Split(str, "\n")
+
+				if len(lines) <= 1 {
+					break
+				}
+
+				lines = lines[1:]
+
+				for _, line := range lines {
+					handleCommand(msg.sender, line)
+				}
+
+				break
+			}
+
 			if str[0] == '/' {
 				handleCommand(msg.sender, str[1:])
 				break
