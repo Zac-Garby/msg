@@ -84,10 +84,7 @@ func (s *Server) HandleMessages() {
 				msg.sender.room = room
 				msg.sender.sentInfo = true
 
-				out := &message{
-					Type: "server-msg",
-					Data: fmt.Sprintf("Hello - welcome to the server, %s.\nType `/help` to view the available commands", name),
-				}
+				out := serverMessage(fmt.Sprintf("Hello - welcome to the server, %s.\nType `/help` to view the available commands", name))
 
 				if err := msg.sender.send(out); err != nil {
 					log.Println("error when sending welcome msg:", err)
@@ -100,13 +97,55 @@ func (s *Server) HandleMessages() {
 				break
 			}
 
+			str, ok := msg.Data.(string)
+			if !ok {
+				log.Println("client", msg.sender.id, "tried to sender a non-string message")
+				break
+			}
+
+			if str[0] == '/' {
+				handleCommand(msg.sender, str[1:])
+				break
+			}
+
 			broadcast(s, &message{
 				Type: "chat",
 				Data: map[string]string{
 					"sender": msg.sender.name,
-					"text":   msg.Data.(string),
+					"text":   str,
 				},
 			})
 		}
+	}
+}
+
+func handleCommand(sender *client, str string) {
+	var (
+		out   string
+		split = strings.Fields(str)
+	)
+
+	if len(split) == 0 || len(str) == 0 {
+		out = "expected a command after `/`"
+	} else {
+		name := split[0]
+
+		cmd, ok := commands[name]
+		if !ok {
+			out = fmt.Sprintf("command not found: %s", name)
+		} else {
+			out = cmd(sender, split)
+		}
+	}
+
+	if err := sender.send(serverMessage(out)); err != nil {
+		log.Println("handleCommand: errored when sending output message")
+	}
+}
+
+func serverMessage(content string) *message {
+	return &message{
+		Type: "server-msg",
+		Data: content,
 	}
 }
