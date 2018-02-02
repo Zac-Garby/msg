@@ -154,6 +154,10 @@ func handleCommand(sender *client, str string) {
 		}
 	}
 
+	if out == "" {
+		return
+	}
+
 	if err := sender.send(serverMessage(out)); err != nil {
 		log.Println("handleCommand: errored when sending output message")
 	}
