@@ -29,7 +29,6 @@ function onMessage(data) {
 		break
 
 	case "server-msg":
-		console.log(msg.data)
 		putMessage("the server", "server-msg", msg.data)
 		break
 	}
@@ -60,6 +59,8 @@ function putMessage(sender, senderClass, content) {
 	var li = document.createElement("li")
 	li.appendChild(name)
 	li.appendChild(text)
-	
-	document.getElementById("chat-log").appendChild(li)
+
+	var log = document.getElementById("chat-log")
+	log.appendChild(li)
+	log.scrollTop = log.scrollHeight
 }
