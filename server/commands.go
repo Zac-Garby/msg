@@ -1,6 +1,9 @@
 package server
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // This function is called whenever a command is called
 // by a client. It is passed a slice of the given
@@ -45,5 +48,24 @@ bg   [colour]   sets your username's background colour to [colour] (a valid CSS 
 
 		c.name = name
 		return fmt.Sprintf("Your name has been changed to %s!", name)
+	}
+
+	commands["list"] = func(s *Server, c *client, args []string) string {
+		room := c.room
+
+		if len(args) > 1 {
+			room = args[1]
+		}
+
+		var (
+			names = s.usersInRoom(room)
+			out   = strings.Join(names, "\n")
+		)
+
+		if len(names) == 0 {
+			return fmt.Sprintf("There are no users in %s", room)
+		}
+
+		return fmt.Sprintf("Users currently in %s (%d)\n%s", room, len(names), out)
 	}
 }

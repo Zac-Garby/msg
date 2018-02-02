@@ -152,6 +152,20 @@ func (s *Server) checkName(name string) bool {
 	return false
 }
 
+// usersInRoom gets a list of the usernames of
+// the users in a given room.
+func (s *Server) usersInRoom(room string) []string {
+	var names []string
+
+	for _, c := range s.clients {
+		if c.room == room {
+			names = append(names, c.name)
+		}
+	}
+
+	return names
+}
+
 func (s *Server) handleCommand(sender *client, str string) {
 	var (
 		out   string
