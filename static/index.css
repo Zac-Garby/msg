@@ -1,0 +1,50 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	outline: none;
+}
+
+html, body {
+	font-family: monospace;
+}
+
+ul#chat-log {
+	border-bottom: 1px solid black;
+	padding-left: 0;
+	display: block;
+	width: 100vw;
+	height: calc(100vh - 70px);
+	resize: none;
+}
+
+ul#chat-log li {
+	padding: 10px;
+	border-bottom: 1px solid #afafaf;
+}
+
+ul#chat-log li .username {
+	font-weight: bold;
+	margin-right: 10px;
+}
+
+ul#chat-log li .server-msg {
+	font-weight: bold;
+	font-style: italic;
+	margin-right: 10px;
+	color: red;
+}
+
+textarea#input {
+	display: block;
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 70px;
+	width: 100vw;
+	border: none;
+	resize: none;
+	background-color: #aaaaff5f;
+}
+
+textarea#input::placeholder {
+	color: #0000aa;
+}

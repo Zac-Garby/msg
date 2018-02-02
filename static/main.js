@@ -1,0 +1,65 @@
+var sock
+
+// connects to the websocket server hosted at
+// ws://{host}.
+function connect() {	
+	sock = new WebSocket(`ws://${window.location.host}/ws`)
+	
+	sock.onopen = function(evt) {
+		sock.send(JSON.stringify({
+			type: "client-info",
+			data: {
+				name: "unnamed",
+				room: "/",
+			},
+		}))
+	}
+
+	sock.onmessage = function(evt) {
+		onMessage(evt.data)
+	}
+}
+
+function onMessage(data) {
+	var msg = JSON.parse(data)
+
+	switch (msg.type) {
+	case "chat":
+		putMessage(msg.data.sender, "username", msg.data.text)
+		break
+
+	case "server-msg":
+		console.log(msg.data)
+		putMessage("the server", "server-msg", msg.data)
+		break
+	}
+}
+
+function handleKey(evt) {
+	if (evt.keyCode === 13 && evt.shiftKey) {
+		evt.preventDefault()
+
+		sock.send(JSON.stringify({
+			type: "chat",
+			data: evt.target.value,
+		}))
+
+		evt.target.value = ""
+	}
+}
+
+function putMessage(sender, senderClass, content) {
+	var name = document.createElement("span")
+	name.className = senderClass
+	name.innerHTML = sender + ":"
+	
+	var text = document.createElement("pre")
+	text.className = "text"
+	text.innerHTML = content
+	
+	var li = document.createElement("li")
+	li.appendChild(name)
+	li.appendChild(text)
+	
+	document.getElementById("chat-log").appendChild(li)
+}

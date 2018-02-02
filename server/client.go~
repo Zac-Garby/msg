@@ -1,0 +1,13 @@
+package server
+
+import (
+	"github.com/gorilla/websocket"
+	uuid "github.com/satori/go.uuid"
+)
+
+type client struct {
+	id   uuid.UUID
+	conn *websocket.Conn
+	room string
+	name string
+}
