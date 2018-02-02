@@ -25,11 +25,11 @@ function onMessage(data) {
 
 	switch (msg.type) {
 	case "chat":
-		putMessage(msg.data.sender, "username", msg.data.text)
+		putMessage(msg.data.sender, "username", "", msg.data.text)
 		break
 
 	case "server-msg":
-		putMessage("the server", "server-msg", msg.data)
+		putMessage("server", "server-username", "server-msg", msg.data)
 		break
 	}
 }
@@ -47,9 +47,9 @@ function handleKey(evt) {
 	}
 }
 
-function putMessage(sender, senderClass, content) {
+function putMessage(sender, nameClass, liClass, content) {
 	var name = document.createElement("span")
-	name.className = senderClass
+	name.className = nameClass
 	name.innerHTML = sender + ":"
 	
 	var text = document.createElement("pre")
@@ -57,6 +57,7 @@ function putMessage(sender, senderClass, content) {
 	text.innerHTML = content
 	
 	var li = document.createElement("li")
+	li.className = liClass
 	li.appendChild(name)
 	li.appendChild(text)
 

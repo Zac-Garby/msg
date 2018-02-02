@@ -28,11 +28,16 @@ ul#chat-log li .username {
 	margin-right: 10px;
 }
 
-ul#chat-log li .server-msg {
+ul#chat-log li .server-username {
 	font-weight: bold;
 	font-style: italic;
 	margin-right: 10px;
-	color: red;
+	color: #cc0000;
+}
+
+ul#chat-log li.server-msg {
+	background-color: #ffdddd;
+	color: #550000;
 }
 
 textarea#input {
