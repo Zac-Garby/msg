@@ -9,6 +9,11 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+const (
+	maxNameLength = 32
+	minNameLength = 2
+)
+
 // A Server is a websocket server which handles
 // websocket connections from clients.
 type Server struct {
@@ -113,14 +118,14 @@ func (s *Server) HandleMessages() {
 				lines = lines[1:]
 
 				for _, line := range lines {
-					handleCommand(msg.sender, line)
+					s.handleCommand(msg.sender, line)
 				}
 
 				break
 			}
 
 			if str[0] == '/' {
-				handleCommand(msg.sender, str[1:])
+				s.handleCommand(msg.sender, str[1:])
 				break
 			}
 
@@ -135,7 +140,19 @@ func (s *Server) HandleMessages() {
 	}
 }
 
-func handleCommand(sender *client, str string) {
+// checkName checks if a client exists with a
+// given name
+func (s *Server) checkName(name string) bool {
+	for _, c := range s.clients {
+		if c.name == name {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (s *Server) handleCommand(sender *client, str string) {
 	var (
 		out   string
 		split = strings.Fields(str)
@@ -150,7 +167,7 @@ func handleCommand(sender *client, str string) {
 		if !ok {
 			out = fmt.Sprintf("command not found: %s", name)
 		} else {
-			out = cmd(sender, split)
+			out = cmd(s, sender, split)
 		}
 	}
 
