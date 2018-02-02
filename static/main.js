@@ -48,6 +48,8 @@ function handleKey(evt) {
 }
 
 function putMessage(sender, nameClass, liClass, content) {
+	content = escapeHTML(content)
+	
 	var name = document.createElement("span")
 	name.className = nameClass
 	name.innerHTML = sender + ":"
@@ -64,4 +66,13 @@ function putMessage(sender, nameClass, liClass, content) {
 	var log = document.getElementById("chat-log")
 	log.appendChild(li)
 	log.scrollTop = log.scrollHeight
+}
+
+function escapeHTML(html) {
+	return html
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
 }
