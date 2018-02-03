@@ -18,7 +18,7 @@ func broadcast(s *Server, m *message) error {
 
 func broadcastRoom(s *Server, room string, m *message) error {
 	for _, client := range s.clients {
-		if client.room != room {
+		if client.Room != room {
 			continue
 		}
 

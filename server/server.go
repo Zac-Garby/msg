@@ -91,8 +91,8 @@ func (s *Server) HandleMessages() {
 					break
 				}
 
-				msg.sender.name = name
-				msg.sender.room = room
+				msg.sender.Name = name
+				msg.sender.Room = room
 				msg.sender.sentInfo = true
 
 				out := serverMessage(fmt.Sprintf(`Hello - welcome to the server, %s.
@@ -137,10 +137,10 @@ You can change your name via the '/name [name]' command.`, name))
 				break
 			}
 
-			broadcastRoom(s, msg.sender.room, &message{
+			broadcastRoom(s, msg.sender.Room, &message{
 				Type: "chat",
-				Data: map[string]string{
-					"sender": msg.sender.name,
+				Data: map[string]interface{}{
+					"sender": msg.sender,
 					"text":   str,
 				},
 			})
@@ -152,7 +152,7 @@ You can change your name via the '/name [name]' command.`, name))
 // given name
 func (s *Server) checkName(name string) bool {
 	for _, c := range s.clients {
-		if c.name == name {
+		if c.Name == name {
 			return true
 		}
 	}
@@ -166,8 +166,8 @@ func (s *Server) usersInRoom(room string) []string {
 	var names []string
 
 	for _, c := range s.clients {
-		if c.room == room {
-			names = append(names, c.name)
+		if c.Room == room {
+			names = append(names, c.Name)
 		}
 	}
 

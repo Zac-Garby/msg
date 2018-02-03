@@ -6,10 +6,14 @@ import (
 )
 
 type client struct {
-	id         uuid.UUID
-	conn       *websocket.Conn
-	room, name string
-	sentInfo   bool
+	id       uuid.UUID
+	conn     *websocket.Conn
+	sentInfo bool
+
+	Room       string `json:"room"`
+	Name       string `json:"name"`
+	Foreground string `json:"fg"`
+	Background string `json:"bg"`
 }
 
 // sends a message to the client

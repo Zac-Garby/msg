@@ -25,7 +25,7 @@ function onMessage(data) {
 
 	switch (msg.type) {
 	case "chat":
-		putMessage(msg.data.sender, "username", "", msg.data.text)
+		putMessage(msg.data.sender.name, "username", "", msg.data.text)
 		break
 
 	case "server-msg":

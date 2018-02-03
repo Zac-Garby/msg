@@ -50,12 +50,12 @@ bg   [colour]   sets your username's background colour to [colour] (a valid CSS 
 			return fmt.Sprintf("A user already exists called %s!", name)
 		}
 
-		c.name = name
+		c.Name = name
 		return fmt.Sprintf("Your name has been changed to %s!", name)
 	}
 
 	commands["list"] = func(s *Server, c *client, args []string) string {
-		room := c.room
+		room := c.Room
 
 		if len(args) > 1 {
 			room = args[1]
@@ -89,10 +89,10 @@ bg   [colour]   sets your username's background colour to [colour] (a valid CSS 
 				return "A room name must only contain letters, numbers, and any of: -_./<>&"
 			}
 
-			c.room = room
-			return fmt.Sprintf("You are now in the room: %s", c.room)
+			c.Room = room
+			return fmt.Sprintf("You are now in the room: %s", c.Room)
 		} else {
-			return fmt.Sprintf("You are currently in the room: %s", c.room)
+			return fmt.Sprintf("You are currently in the room: %s", c.Room)
 		}
 	}
 }
