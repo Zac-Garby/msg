@@ -91,6 +91,15 @@ func (s *Server) HandleMessages() {
 					break
 				}
 
+				if reason, ok := validateName(name, s); !ok {
+					out := serverMessage(fmt.Sprintf("Your username is invalid (%s). This might be a bug (report on the GitHub repository?)", reason))
+					if err := msg.sender.send(out); err != nil {
+						log.Println("error when sending invalid username msg:", err)
+					}
+
+					break
+				}
+
 				msg.sender.Name = name
 				msg.sender.Room = room
 				msg.sender.sentInfo = true

@@ -31,20 +31,8 @@ name [name]     sets your username to [name]`
 
 		name := args[1]
 
-		if len(name) > maxNameLength {
-			return fmt.Sprintf("Your name cannot be longer than %d characters", maxNameLength)
-		}
-
-		if len(name) < minNameLength {
-			return fmt.Sprintf("Your name cannot be less than %d characters", minNameLength)
-		}
-
-		if !usernameRegex.MatchString(name) {
-			return "Your username must contain only letters, numbers, hyphens, underscores, and dots"
-		}
-
-		if s.checkName(name) {
-			return fmt.Sprintf("A user already exists called %s!", name)
+		if msg, ok := validateName(name, s); !ok {
+			return msg
 		}
 
 		c.Name = name
