@@ -21,10 +21,7 @@ func init() {
 help            prints help about the commands
 list            lists the users in the current room
 room [room]     with no arguments, prints the current room. otherwise, switches to [room]
-quit            exits to the landing page
-name [name]     sets your username to [name]
-fg   [colour]   sets your username's foreground colour to [colour] (a valid CSS colour)
-bg   [colour]   sets your username's background colour to [colour] (a valid CSS colour)`
+name [name]     sets your username to [name]`
 	}
 
 	commands["name"] = func(s *Server, c *client, args []string) string {

@@ -10,10 +10,8 @@ type client struct {
 	conn     *websocket.Conn
 	sentInfo bool
 
-	Room       string `json:"room"`
-	Name       string `json:"name"`
-	Foreground string `json:"fg"`
-	Background string `json:"bg"`
+	Room string `json:"room"`
+	Name string `json:"name"`
 }
 
 // sends a message to the client
