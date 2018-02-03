@@ -3,15 +3,17 @@ package server
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
 )
 
-const (
+var (
 	maxNameLength = 32
 	minNameLength = 2
+	usernameRegex = regexp.MustCompile(`[\p{L}\p{N}-_.]+`)
 )
 
 // A Server is a websocket server which handles

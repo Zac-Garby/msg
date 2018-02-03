@@ -42,6 +42,10 @@ bg   [colour]   sets your username's background colour to [colour] (a valid CSS 
 			return fmt.Sprintf("Your name cannot be less than %d characters", minNameLength)
 		}
 
+		if !usernameRegex.MatchString(name) {
+			return "Your username must contain only letters, numbers, hyphens, underscores, and dots"
+		}
+
 		if s.checkName(name) {
 			return fmt.Sprintf("A user already exists called %s!", name)
 		}
