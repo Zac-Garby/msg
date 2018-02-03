@@ -9,7 +9,7 @@ function connect() {
 		sock.send(JSON.stringify({
 			type: "client-info",
 			data: {
-				name: "unnamed",
+				name: "anon",
 				room: "/",
 			},
 		}))
