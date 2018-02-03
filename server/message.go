@@ -15,3 +15,17 @@ func broadcast(s *Server, m *message) error {
 
 	return nil
 }
+
+func broadcastRoom(s *Server, room string, m *message) error {
+	for _, client := range s.clients {
+		if client.room != room {
+			continue
+		}
+
+		if err := client.send(m); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

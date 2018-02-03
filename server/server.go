@@ -135,7 +135,7 @@ func (s *Server) HandleMessages() {
 				break
 			}
 
-			broadcast(s, &message{
+			broadcastRoom(s, msg.sender.room, &message{
 				Type: "chat",
 				Data: map[string]string{
 					"sender": msg.sender.name,
