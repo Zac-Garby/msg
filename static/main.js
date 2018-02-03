@@ -9,8 +9,8 @@ function connect() {
 		sock.send(JSON.stringify({
 			type: "client-info",
 			data: {
-				name: "anon",
-				room: "/",
+				name: getCookie("name") || "anon",
+				room: getCookie("room") || "/",
 			},
 		}))
 	}
@@ -81,4 +81,10 @@ function escapeHTML(html) {
          .replace(/>/g, "&gt;")
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
+}
+
+function getCookie(name) {
+	var value = "; " + document.cookie
+	var parts = value.split("; " + name + "=")
+	if (parts.length == 2) return parts.pop().split(";").shift()
 }

@@ -38,7 +38,11 @@ func main() {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "static/index.html")
+	if name, err := r.Cookie("name"); err == nil && name.Value != "" {
+		http.ServeFile(w, r, "static/messager.html")
+	} else {
+		http.ServeFile(w, r, "static/index.html")
+	}
 }
 
 func websocketHandler(w http.ResponseWriter, r *http.Request) {

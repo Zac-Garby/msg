@@ -4,15 +4,33 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
 	<link rel="stylesheet" href="static/index.css" />
-	<script src="static/main.js"></script>
+	<script src="static/index.js"></script>
 	
-	<title>msg</title>
+	<title>msg - home</title>
   </head>
-  <body onload="connect()">
-	<ul id="chat-log"></ul>
-	<textarea id="input" onkeypress="handleKey(event)" placeholder="Type a message here. Press shift+return to send it"></textarea>
-	<button id="send-msg" onclick="sendMessage()">Send</button>
+  <body>
+	<div class="center">
+	  <h1>log in</h1>
+
+	  <p>
+		To log in, you don't need to make an account. Just
+		enter a name and what room you want to go to. You can
+		change both of these things later via commands.
+	  </p>
+	  
+	  <p>
+		Username:
+		<input class="login" id="name" placeholder="anon"></input>
+	  </p>
+	  <p>
+		Room:
+		<input class="login" id="room" placeholder="/"></input>
+	  </p>
+	  <p>
+		<button id="login-btn" onclick="login()">Log in</button>
+	  </p>
+	</div>
   </body>
 </html>
