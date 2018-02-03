@@ -43,3 +43,20 @@ func validateName(name string, s *Server) (reason string, ok bool) {
 
 	return "", true
 }
+
+// validateRoom checks if a room is valid
+func validateRoom(room string) (reason string, ok bool) {
+	if len(room) > maxRoomLength {
+		return fmt.Sprintf("A room name cannot be longer than %d characters", maxNameLength), false
+	}
+
+	if len(room) < minRoomLength {
+		return fmt.Sprintf("A room name cannot be less than %d characters", minNameLength), false
+	}
+
+	if !roomNameRegex.MatchString(room) {
+		return "A room name must only contain letters, numbers, and any of: -_./<>&", false
+	}
+
+	return "", true
+}

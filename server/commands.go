@@ -62,16 +62,8 @@ name [name]     sets your username to [name]`
 		if len(args) > 1 {
 			room := args[1]
 
-			if len(room) > maxRoomLength {
-				return fmt.Sprintf("A room name cannot be longer than %d characters", maxNameLength)
-			}
-
-			if len(room) < minRoomLength {
-				return fmt.Sprintf("A room name cannot be less than %d characters", minNameLength)
-			}
-
-			if !roomNameRegex.MatchString(room) {
-				return "A room name must only contain letters, numbers, and any of: -_./<>&"
+			if msg, ok := validateRoom(room); !ok {
+				return msg
 			}
 
 			c.Room = room
