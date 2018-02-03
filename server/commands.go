@@ -72,4 +72,27 @@ bg   [colour]   sets your username's background colour to [colour] (a valid CSS 
 
 		return fmt.Sprintf("Users currently in %s (%d)\n%s", room, len(names), out)
 	}
+
+	commands["room"] = func(s *Server, c *client, args []string) string {
+		if len(args) > 1 {
+			room := args[1]
+
+			if len(room) > maxRoomLength {
+				return fmt.Sprintf("A room name cannot be longer than %d characters", maxNameLength)
+			}
+
+			if len(room) < minRoomLength {
+				return fmt.Sprintf("A room name cannot be less than %d characters", minNameLength)
+			}
+
+			if !roomNameRegex.MatchString(room) {
+				return "A room name must only contain letters, numbers, and any of: -_./<>&"
+			}
+
+			c.room = room
+			return fmt.Sprintf("You are now in the room: %s", c.room)
+		} else {
+			return fmt.Sprintf("You are currently in the room: %s", c.room)
+		}
+	}
 }

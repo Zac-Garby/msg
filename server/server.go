@@ -14,6 +14,10 @@ var (
 	maxNameLength = 32
 	minNameLength = 2
 	usernameRegex = regexp.MustCompile(`[\p{L}\p{N}-_.]+`)
+
+	maxRoomLength = 64
+	minRoomLength = 1
+	roomNameRegex = regexp.MustCompile(`[\p{L}\p{N}-_./<>&]`)
 )
 
 // A Server is a websocket server which handles
