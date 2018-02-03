@@ -38,13 +38,19 @@ function handleKey(evt) {
 	if (evt.keyCode === 13 && evt.shiftKey) {
 		evt.preventDefault()
 
-		sock.send(JSON.stringify({
-			type: "chat",
-			data: evt.target.value,
-		}))
-
-		evt.target.value = ""
+		sendMessage()
 	}
+}
+
+function sendMessage() {
+	var elem = document.getElementById("input")
+
+	sock.send(JSON.stringify({
+		type: "chat",
+		data: elem.value,
+	}))
+	
+	elem.value = ""
 }
 
 function putMessage(sender, nameClass, liClass, content) {
