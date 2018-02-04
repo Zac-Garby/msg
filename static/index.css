@@ -34,13 +34,6 @@ ul#chat-log li .username {
 	margin-right: 10px;
 }
 
-ul#chat-log li .server-username {
-	font-weight: bold;
-	font-style: italic;
-	margin-right: 10px;
-	color: #0000cc;
-}
-
 ul#chat-log li.server-msg {
 	background-color: #ddddff;
 	color: #000055;

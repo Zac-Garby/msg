@@ -29,7 +29,7 @@ function onMessage(data) {
 		break
 
 	case "server-msg":
-		putMessage("server", "server-username", "server-msg", msg.data)
+		putMessage("server", "", "server-msg", msg.data)
 		break
 	}
 }
@@ -66,7 +66,7 @@ function putMessage(sender, nameClass, liClass, content) {
 	
 	var li = document.createElement("li")
 	li.className = liClass
-	li.appendChild(name)
+	if (liClass !== "server-msg") li.appendChild(name)
 	li.appendChild(text)
 
 	var log = document.getElementById("chat-log")
