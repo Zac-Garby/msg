@@ -18,6 +18,8 @@ var (
 	maxRoomLength = 64
 	minRoomLength = 1
 	roomNameRegex = regexp.MustCompile(`^[\p{L}\p{N}-_./<>&]+$`)
+
+	maxMessageLength = 1024
 )
 
 // A Server is a websocket server which handles
@@ -131,6 +133,13 @@ You can change your name via the '/name [name]' command.`, name))
 			str, ok := msg.Data.(string)
 			if !ok {
 				log.Println("client", msg.sender.id, "tried to send a non-string message")
+				break
+			}
+
+			if len(str) < 1 || len(str) > maxMessageLength {
+				msg.sender.send(serverMessage(
+					fmt.Sprintf("Your message must be at least one character and less than %d characters", maxMessageLength),
+				))
 				break
 			}
 
