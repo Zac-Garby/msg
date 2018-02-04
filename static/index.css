@@ -23,6 +23,12 @@ ul#chat-log li {
 	border-bottom: 1px solid #afafaf;
 }
 
+ul#chat-log li pre {
+	overflow-wrap: normal;
+	word-wrap: break-word;
+	hyphens: auto;
+}
+
 ul#chat-log li .username {
 	font-weight: bold;
 	margin-right: 10px;

@@ -60,7 +60,7 @@ function putMessage(sender, nameClass, liClass, content) {
 	name.className = nameClass
 	name.innerHTML = sender + ":"
 	
-	var text = document.createElement("p")
+	var text = document.createElement("pre")
 	text.className = "text"
 	text.innerHTML = content
 	
