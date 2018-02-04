@@ -24,6 +24,7 @@ There are still a number of things that need doing:
   - Admins
     - Since user's aren't really a thing, there would
 	  need to be some other system
+  - Back up messages to a database (probably Redis)
   - Muting other users
   - Limiting amount of messages per minute
   - Improve styles on phones
