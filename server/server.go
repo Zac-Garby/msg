@@ -121,7 +121,7 @@ func (s *Server) HandleMessages() {
 
 				out := serverMessage(fmt.Sprintf(`Hello - welcome to the server, %s.
 Type 'help' to view the available commands.
-You can change your name via the '/name [name]' command.`, name))
+You can go to another room using the '/room [room-name]' command.`, name))
 
 				if err := msg.sender.send(out); err != nil {
 					log.Println("error when sending welcome msg:", err)
