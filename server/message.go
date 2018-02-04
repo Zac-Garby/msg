@@ -10,8 +10,6 @@ func broadcast(s *Server, m *message) {
 	for _, client := range s.clients {
 		client.send(m)
 	}
-
-	return nil
 }
 
 func broadcastRoom(s *Server, room string, m *message) {
