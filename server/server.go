@@ -70,6 +70,10 @@ func (s *Server) NewClient(conn *websocket.Conn) error {
 		s.messages <- msg
 	}
 
+	if client.sentInfo {
+		broadcast(s, serverMessage(fmt.Sprintf("%s has left the server", client.Name)))
+	}
+
 	delete(s.clients, id)
 
 	return nil
@@ -122,6 +126,8 @@ You can change your name via the '/name [name]' command.`, name))
 				if err := msg.sender.send(out); err != nil {
 					log.Println("error when sending welcome msg:", err)
 				}
+
+				broadcast(s, serverMessage(fmt.Sprintf("%s has joined the server, and is in the room: '%s'", name, room)))
 			}
 
 		case "chat":
