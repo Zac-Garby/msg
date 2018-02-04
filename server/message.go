@@ -6,26 +6,20 @@ type message struct {
 	sender *client
 }
 
-func broadcast(s *Server, m *message) error {
+func broadcast(s *Server, m *message) {
 	for _, client := range s.clients {
-		if err := client.send(m); err != nil {
-			return err
-		}
+		client.send(m)
 	}
 
 	return nil
 }
 
-func broadcastRoom(s *Server, room string, m *message) error {
+func broadcastRoom(s *Server, room string, m *message) {
 	for _, client := range s.clients {
 		if client.Room != room {
 			continue
 		}
 
-		if err := client.send(m); err != nil {
-			return err
-		}
+		client.send(m)
 	}
-
-	return nil
 }
