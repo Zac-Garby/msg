@@ -67,8 +67,8 @@ func validateHandler(w http.ResponseWriter, r *http.Request) {
 		name := nameSlice[0]
 		reason, valid := server.ValidateName(name, s)
 		if !valid {
-			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, reason)
+			return
 		}
 	}
 
@@ -77,8 +77,10 @@ func validateHandler(w http.ResponseWriter, r *http.Request) {
 		room := roomSlice[0]
 		reason, valid := server.ValidateRoom(room)
 		if !valid {
-			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, reason)
+			return
 		}
 	}
+
+	fmt.Fprintf(w, "ok")
 }

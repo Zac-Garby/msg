@@ -92,6 +92,10 @@ div.center p {
 	margin-bottom: 20px;
 }
 
+div.center p#error {
+	color: red;
+}
+
 div.center input.login {
 	position: absolute;
 	right: 0;
