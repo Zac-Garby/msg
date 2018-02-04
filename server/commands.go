@@ -61,12 +61,16 @@ name [name]     sets your username to [name]`
 	commands["room"] = func(s *Server, c *client, args []string) string {
 		if len(args) > 1 {
 			room := args[1]
+			broadcastRoom(s, c.Room, serverMessage(fmt.Sprintf("%s has left the room %s", c.Name, c.Room)))
 
 			if msg, ok := ValidateRoom(room); !ok {
 				return msg
 			}
 
 			c.Room = room
+
+			broadcastRoom(s, c.Room, serverMessage(fmt.Sprintf("%s has joined the room %s", c.Name, c.Room)))
+
 			return fmt.Sprintf("You are now in the room: %s", c.Room)
 		} else {
 			return fmt.Sprintf("You are currently in the room: %s", c.Room)
