@@ -46,6 +46,7 @@ textarea#input {
 	width: 100vw;
 	border: none;
 	resize: none;
+	padding-right: 70px;
 	background-color: #aaaaff3f;
 }
 
