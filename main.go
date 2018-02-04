@@ -24,6 +24,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/ws", websocketHandler)
+	r.HandleFunc("/validate", validateHandler)
 
 	r.PathPrefix("/static/").Handler(
 		http.StripPrefix("/static/",
@@ -55,5 +56,29 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 	if err := s.NewClient(conn); err != nil {
 		log.Println("server err:", err)
 		return
+	}
+}
+
+func validateHandler(w http.ResponseWriter, r *http.Request) {
+	vals := r.URL.Query()
+
+	nameSlice, ok := vals["name"]
+	if ok && len(nameSlice) > 0 {
+		name := nameSlice[0]
+		reason, valid := server.ValidateName(name, s)
+		if !valid {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, reason)
+		}
+	}
+
+	roomSlice, ok := vals["room"]
+	if ok && len(roomSlice) > 0 {
+		room := roomSlice[0]
+		reason, valid := server.ValidateRoom(room)
+		if !valid {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, reason)
+		}
 	}
 }
