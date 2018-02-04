@@ -21,7 +21,8 @@ func init() {
 help            prints help about the commands
 list            lists the users in the current room
 room [room]     with no arguments, prints the current room. otherwise, switches to [room]
-name [name]     sets your username to [name]`
+name [name]     sets your username to [name]
+quit            exits the server and returns to the login page`
 	}
 
 	commands["name"] = func(s *Server, c *client, args []string) string {
