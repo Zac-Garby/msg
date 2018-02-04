@@ -21,10 +21,10 @@ func (c *client) send(m *message) error {
 	return c.conn.WriteJSON(m)
 }
 
-// validateName checks if a name is valid,
+// ValidateName checks if a name is valid,
 // i.e. if it is the right length, matches the
 // regex, and isn't already taken.
-func validateName(name string, s *Server) (reason string, ok bool) {
+func ValidateName(name string, s *Server) (reason string, ok bool) {
 	if len(name) > maxNameLength {
 		return fmt.Sprintf("Your name cannot be longer than %d characters", maxNameLength), false
 	}
@@ -44,8 +44,8 @@ func validateName(name string, s *Server) (reason string, ok bool) {
 	return "", true
 }
 
-// validateRoom checks if a room is valid
-func validateRoom(room string) (reason string, ok bool) {
+// ValidateRoom checks if a room is valid
+func ValidateRoom(room string) (reason string, ok bool) {
 	if len(room) > maxRoomLength {
 		return fmt.Sprintf("A room name cannot be longer than %d characters", maxNameLength), false
 	}

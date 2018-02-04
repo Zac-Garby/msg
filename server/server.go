@@ -91,7 +91,7 @@ func (s *Server) HandleMessages() {
 					break
 				}
 
-				if reason, ok := validateName(name, s); !ok {
+				if reason, ok := ValidateName(name, s); !ok {
 					out := serverMessage(fmt.Sprintf("Your username is invalid (%s)", reason))
 					if err := msg.sender.send(out); err != nil {
 						log.Println("error when sending invalid username msg:", err)
@@ -100,7 +100,7 @@ func (s *Server) HandleMessages() {
 					break
 				}
 
-				if reason, ok := validateRoom(room); !ok {
+				if reason, ok := ValidateRoom(room); !ok {
 					out := serverMessage(fmt.Sprintf("Your room name is invalid (%s)", reason))
 					if err := msg.sender.send(out); err != nil {
 						log.Println("error when sending invalid room msg:", err)

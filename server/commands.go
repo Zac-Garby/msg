@@ -31,7 +31,7 @@ name [name]     sets your username to [name]`
 
 		name := args[1]
 
-		if msg, ok := validateName(name, s); !ok {
+		if msg, ok := ValidateName(name, s); !ok {
 			return msg
 		}
 
@@ -62,7 +62,7 @@ name [name]     sets your username to [name]`
 		if len(args) > 1 {
 			room := args[1]
 
-			if msg, ok := validateRoom(room); !ok {
+			if msg, ok := ValidateRoom(room); !ok {
 				return msg
 			}
 
