@@ -76,4 +76,16 @@ name [name]     sets your username to [name]`
 			return fmt.Sprintf("You are currently in the room: %s", c.Room)
 		}
 	}
+
+	commands["quit"] = func(s *Server, c *client, args []string) string {
+		msg := &message{
+			Type: "quit",
+		}
+
+		if err := c.send(msg); err != nil {
+			return "Could not send quit message. It's possible you're not connected to the server."
+		}
+
+		return ""
+	}
 }
