@@ -130,7 +130,7 @@ You can change your name via the '/name [name]' command.`, name))
 
 			str, ok := msg.Data.(string)
 			if !ok {
-				log.Println("client", msg.sender.id, "tried to sender a non-string message")
+				log.Println("client", msg.sender.id, "tried to send a non-string message")
 				break
 			}
 
