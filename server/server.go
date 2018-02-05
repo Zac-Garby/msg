@@ -3,240 +3,95 @@ package server
 import (
 	"fmt"
 	"log"
-	"regexp"
+	"net"
+	"net/http"
 	"strings"
 
+	"github.com/Zac-Garby/msg/backend"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
 )
 
-var (
-	maxNameLength = 32
-	minNameLength = 2
-	usernameRegex = regexp.MustCompile(`^[\p{L}\p{N}-_.]+$`)
-
-	maxRoomLength = 64
-	minRoomLength = 1
-	roomNameRegex = regexp.MustCompile(`^[\p{L}\p{N}-_./<>&]+$`)
-
-	maxMessageLength = 1024
-)
-
-// A Server is a websocket server which handles
-// websocket connections from clients.
+// The Server serves the website, and creates websocket connections
+// to clients. When a message is received on a websocket, it's relayed
+// to the backend and, in certain cases, a message is sent back.
 type Server struct {
-	messages chan *message
-	clients  map[uuid.UUID]*client
+	backend     *backend.Backend
+	connections map[uuid.UUID]*websocket.Conn
+	upgrader    websocket.Upgrader
 }
 
-// New creates a new server.
+// New constructs a new Server instance.
 func New() *Server {
-	s := &Server{
-		messages: make(chan *message, 1),
-		clients:  make(map[uuid.UUID]*client),
+	return &Server{
+		backend:  backend.New(),
+		connects: make(map[uuid.UUID]*websocket.Conn),
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+		},
 	}
-
-	return s
 }
 
-func (s *Server) NewClient(conn *websocket.Conn) error {
+// Start starts serving the website and listening for websocket connections.
+func (s *Server) Start() {
+	r := mux.NewRouter()
+	r.HandleFunc("/", s.indexHandler)
+	r.HandleFunc("/ws", s.websocketHandler)
+	r.HandleFunc("/validate", s.validateHandler)
+	r.Handle("/favicon.ico", http.FileServer(http.Dir("./static/")))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(".static/"))))
+
+	log.Println("listening on localhost:3000")
+	http.ListenAndServe(":3000", r)
+}
+
+func (s *Server) newClient(conn *websocket.Conn) error {
 	defer conn.Close()
 
 	id := uuid.NewV4()
-
-	s.clients[id] = &client{
-		id:       id,
-		conn:     conn,
-		sentInfo: false,
+	s.backend.Clients[id] = &backend.Client{
+		ID:        id,
+		Connected: false, // set to true after client info receieved
 	}
+	s.connections[id] = conn
 
-	client := s.clients[id]
+	client := s.backend.Clients[id]
 
 	for {
-		msg := &message{
-			sender: client,
-		}
+		msg, err := read(conn)
 
-		if err := conn.ReadJSON(msg); err != nil {
+		if err != nil {
+			// Under certain conditions, don't log an error
 			if strings.Contains(err.Error(), "use of closed network") ||
 				strings.Contains(err.Error(), "unexpected EOF") {
 				break
 			}
 
-			log.Println("server err: listen:", err)
+			log.Println("server err when listening:", err)
 			break
 		}
 
-		s.messages <- msg
+		s.backend.Incoming <- msg
 	}
 
-	if client.sentInfo {
-		broadcast(s, serverMessage(fmt.Sprintf("%s has left the server", client.Name)))
+	if client.Connected {
+		serverMessage(fmt.Sprintf("%s has left the server", client.Name)).Broadcast(s.backend)
 	}
 
-	delete(s.clients, id)
+	delete(s.backend.Clients, id)
 
 	return nil
 }
 
-func (s *Server) HandleMessages() {
-	for {
-		msg := <-s.messages
-
-		switch msg.Type {
-		case "client-info":
-			data, ok := msg.Data.(map[string]interface{})
-			if ok {
-				name, ok := data["name"].(string)
-				if !ok {
-					break
-				}
-
-				room, ok := data["room"].(string)
-				if !ok {
-					break
-				}
-
-				if reason, ok := ValidateName(name, s); !ok {
-					out := serverMessage(fmt.Sprintf("Your username is invalid (%s)", reason))
-					if err := msg.sender.send(out); err != nil {
-						log.Println("error when sending invalid username msg:", err)
-					}
-
-					break
-				}
-
-				if reason, ok := ValidateRoom(room); !ok {
-					out := serverMessage(fmt.Sprintf("Your room name is invalid (%s)", reason))
-					if err := msg.sender.send(out); err != nil {
-						log.Println("error when sending invalid room msg:", err)
-					}
-
-					break
-				}
-
-				msg.sender.Name = name
-				msg.sender.Room = room
-				msg.sender.sentInfo = true
-
-				out := serverMessage(fmt.Sprintf(`Hello - welcome to the server, %s.
-Type 'help' to view the available commands.
-You can go to another room using the '/room [room-name]' command.`, name))
-
-				if err := msg.sender.send(out); err != nil {
-					log.Println("error when sending welcome msg:", err)
-				}
-
-				broadcast(s, serverMessage(fmt.Sprintf("%s has joined the server, and is in the room: '%s'", name, room)))
-			}
-
-		case "chat":
-			if !msg.sender.sentInfo {
-				log.Println("a client tried to send a message, but hadn't sent client info beforehand")
-				break
-			}
-
-			str, ok := msg.Data.(string)
-			if !ok {
-				log.Println("client", msg.sender.id, "tried to send a non-string message")
-				break
-			}
-
-			if len(str) < 1 || len(str) > maxMessageLength {
-				msg.sender.send(serverMessage(
-					fmt.Sprintf("Your message must be at least one character and less than %d characters", maxMessageLength),
-				))
-				break
-			}
-
-			if strings.HasPrefix(str, "/script") {
-				lines := strings.Split(str, "\n")
-
-				if len(lines) <= 1 {
-					break
-				}
-
-				lines = lines[1:]
-
-				for _, line := range lines {
-					s.handleCommand(msg.sender, line)
-				}
-
-				break
-			}
-
-			if str[0] == '/' {
-				s.handleCommand(msg.sender, str[1:])
-				break
-			}
-
-			broadcastRoom(s, msg.sender.Room, &message{
-				Type: "chat",
-				Data: map[string]interface{}{
-					"sender": msg.sender,
-					"text":   str,
-				},
-			})
-		}
-	}
+func (s *Server) read(conn *websocket.Conn) (*backend.Message, net.Error) {
+	msg := &backend.Message{}
+	return msg, conn.ReadJSON(msg)
 }
 
-// checkName checks if a client exists with a
-// given name
-func (s *Server) checkName(name string) bool {
-	for _, c := range s.clients {
-		if c.Name == name {
-			return true
-		}
-	}
-
-	return false
-}
-
-// usersInRoom gets a list of the usernames of
-// the users in a given room.
-func (s *Server) usersInRoom(room string) []string {
-	var names []string
-
-	for _, c := range s.clients {
-		if c.Room == room {
-			names = append(names, c.Name)
-		}
-	}
-
-	return names
-}
-
-func (s *Server) handleCommand(sender *client, str string) {
-	var (
-		out   string
-		split = strings.Fields(str)
-	)
-
-	if len(split) == 0 || len(str) == 0 {
-		out = "expected a command after `/`"
-	} else {
-		name := split[0]
-
-		cmd, ok := commands[name]
-		if !ok {
-			out = fmt.Sprintf("command not found: %s", name)
-		} else {
-			out = cmd(s, sender, split)
-		}
-	}
-
-	if out == "" {
-		return
-	}
-
-	if err := sender.send(serverMessage(out)); err != nil {
-		log.Println("handleCommand: errored when sending output message")
-	}
-}
-
-func serverMessage(content string) *message {
-	return &message{
+func (s *Server) serverMessage(content string) *backend.Message {
+	return &backend.Message{
 		Type: "server-msg",
 		Data: content,
 	}
