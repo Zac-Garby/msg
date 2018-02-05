@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -77,7 +76,7 @@ func (s *Server) newClient(conn *websocket.Conn) error {
 	}
 
 	if client.Connected {
-		serverMessage(fmt.Sprintf("%s has left the server", client.Name)).Broadcast(s.backend)
+		serverMessage("%s has left the server", client.Name).Broadcast(s.backend)
 	}
 
 	delete(s.backend.Clients, id)
@@ -90,9 +89,6 @@ func (s *Server) read(conn *websocket.Conn) (*backend.Message, net.Error) {
 	return msg, conn.ReadJSON(msg)
 }
 
-func (s *Server) serverMessage(content string) *backend.Message {
-	return &backend.Message{
-		Type: "server-msg",
-		Data: content,
-	}
+func serverMessage(format string, args ...interface{}) *backend.Message {
+	return backend.ServerMessage(format, args...)
 }

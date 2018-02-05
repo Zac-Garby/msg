@@ -37,6 +37,17 @@ func (b *Backend) GetUser(name string) (*Client, bool) {
 	return nil, false
 }
 
+// UsersInRoom gets a list of users (by username) in a given room.
+func (b *Backend) UsersInRoom(room string) (names []string) {
+	for _, c := range b.Clients {
+		if c.Room == room {
+			names = append(names, c.Name)
+		}
+	}
+
+	return
+}
+
 // ValidateName checks if a name is valid. A valid name is of a
 // valid length (between min and maxNameLength), matches the regex
 // usernameRegex, and isn't taken.
