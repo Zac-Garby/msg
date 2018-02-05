@@ -33,7 +33,7 @@ func (s *Server) validateHandler(w http.ResponseWriter, r *http.Request) {
 	nameSlice, ok := vals["name"]
 	if ok && len(nameSlice) > 0 {
 		name := nameSlice[0]
-		reason, valid := s.backend.ValidateName(name, s)
+		reason, valid := s.backend.ValidateName(name)
 		if !valid {
 			fmt.Fprintf(w, reason)
 			return

@@ -26,6 +26,15 @@ type Backend struct {
 	Clients            map[uuid.UUID]*Client
 }
 
+// New constructs a new Backend with default values.
+func New() *Backend {
+	return &Backend{
+		Incoming: make(chan *Message),
+		Outgoing: make(chan *Message),
+		Clients:  make(map[uuid.UUID]*Client),
+	}
+}
+
 // GetUser gets a user by name.
 func (b *Backend) GetUser(name string) (*Client, bool) {
 	for _, client := range b.Clients {

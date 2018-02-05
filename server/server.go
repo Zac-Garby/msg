@@ -2,7 +2,6 @@ package server
 
 import (
 	"log"
-	"net"
 	"net/http"
 	"strings"
 
@@ -24,8 +23,8 @@ type Server struct {
 // New constructs a new Server instance.
 func New() *Server {
 	return &Server{
-		backend:  backend.New(),
-		connects: make(map[uuid.UUID]*websocket.Conn),
+		backend:     backend.New(),
+		connections: make(map[uuid.UUID]*websocket.Conn),
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
@@ -40,7 +39,10 @@ func (s *Server) Start() {
 	r.HandleFunc("/ws", s.websocketHandler)
 	r.HandleFunc("/validate", s.validateHandler)
 	r.Handle("/favicon.ico", http.FileServer(http.Dir("./static/")))
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(".static/"))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("./static/"))))
+
+	go s.handleOutgoing()
+	go s.backend.HandleIncoming()
 
 	log.Println("listening on localhost:3000")
 	http.ListenAndServe(":3000", r)
@@ -59,7 +61,7 @@ func (s *Server) newClient(conn *websocket.Conn) error {
 	client := s.backend.Clients[id]
 
 	for {
-		msg, err := read(conn)
+		msg, err := s.read(conn)
 
 		if err != nil {
 			// Under certain conditions, don't log an error
@@ -71,6 +73,8 @@ func (s *Server) newClient(conn *websocket.Conn) error {
 			log.Println("server err when listening:", err)
 			break
 		}
+
+		msg.Client = client
 
 		s.backend.Incoming <- msg
 	}
@@ -84,7 +88,7 @@ func (s *Server) newClient(conn *websocket.Conn) error {
 	return nil
 }
 
-func (s *Server) read(conn *websocket.Conn) (*backend.Message, net.Error) {
+func (s *Server) read(conn *websocket.Conn) (*backend.Message, error) {
 	msg := &backend.Message{}
 	return msg, conn.ReadJSON(msg)
 }

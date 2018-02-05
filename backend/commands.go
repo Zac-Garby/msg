@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (s *Backend) handleCommand(sender *Client, str string) {
+func (b *Backend) handleCommand(sender *Client, str string) {
 	var (
 		out  string
 		args = strings.Fields(str)
@@ -57,7 +57,7 @@ quit          logs you out of the server and exits to the login page
 		}
 
 		var (
-			names = s.UsersInRoom(room)
+			names = b.UsersInRoom(room)
 			out   = strings.Join(names, "\n")
 		)
 
@@ -102,12 +102,16 @@ quit          logs you out of the server and exits to the login page
 
 		c.Name = name
 		ServerMessage("%s has changed their name to %s", old, c.Name).Broadcast(b, c.Room)
+
+		return ""
 	}
 
 	commands["quit"] = func(b *Backend, c *Client, args []string) string {
-		&Message{
+		msg := &Message{
 			Type: MsgQuit,
-		}.Send(b, c)
+		}
+
+		msg.Send(b, c)
 
 		return ""
 	}

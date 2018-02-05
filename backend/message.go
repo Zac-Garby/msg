@@ -25,7 +25,7 @@ type Message struct {
 func ServerMessage(format string, args ...interface{}) *Message {
 	return &Message{
 		Type: MsgServer,
-		Data: fmt.Sprintf(content, args...),
+		Data: fmt.Sprintf(format, args...),
 	}
 }
 
@@ -109,7 +109,7 @@ You can go to another room using the '/room [room-name]' command.`, name).Send(b
 	ServerMessage("%s has joined the server, in room '%s'", name, room).Broadcast(b)
 }
 
-func (b *backend) handleChatMessage(sender *Client, str string) {
+func (b *Backend) handleChatMessage(sender *Client, str string) {
 	if len(str) < 1 || len(str) > maxMessageLength {
 		ServerMessage("Your message must be between 1 and %d characters long", maxMessageLength).Send(b, sender)
 		return
@@ -120,11 +120,13 @@ func (b *backend) handleChatMessage(sender *Client, str string) {
 		return
 	}
 
-	&Message{
+	msg := &Message{
 		Type: MsgChat,
 		Data: map[string]interface{}{
 			"sender": sender,
 			"text":   str,
 		},
-	}.Broadcast(b, sender.Room)
+	}
+
+	msg.Broadcast(b, sender.Room)
 }
