@@ -7,8 +7,8 @@ import uuid "github.com/satori/go.uuid"
 // is specified by the connected flag, and if false,
 // Name and Room probably aren't set.
 type Client struct {
-	id        uuid.UUID
-	connected bool
+	ID        uuid.UUID
+	Connected bool `json:"-"`
 
 	Name string `json:"name"`
 	Room string `json:"room"`
