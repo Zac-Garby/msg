@@ -10,7 +10,6 @@ It's usable, and has quite a lot of useful features:
     - Rooms don't need to be created either
   - Commands
     - Executed on the server
-	- Special command `/script` allows you to execute
 	  lots of commands at the same time
   - Easy deployment
     - Just clone the repository and run `main.go`
