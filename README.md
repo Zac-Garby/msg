@@ -8,6 +8,7 @@ It's usable, and has quite a lot of useful features:
     - You don't need to make an account
   - Rooms
     - Rooms don't need to be created either
+    - Join a room with `/room [name]`
   - Commands
     - Executed on the server
 	- Special command `/script` allows you to execute
