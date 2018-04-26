@@ -39,6 +39,13 @@ quit            exits the server and returns to the login page`
 		broadcastRoom(s, c.Room, serverMessage(fmt.Sprintf("%s is now called %s.", c.Name, name)), c.id)
 
 		c.Name = name
+
+		// tell the client to update their name cookie
+		c.send(&message{
+			Type: "cookie",
+			Data: fmt.Sprintf("name=%s;", c.Name),
+		})
+
 		return fmt.Sprintf("Your name has been changed to %s!", name)
 	}
 
