@@ -36,6 +36,8 @@ quit            exits the server and returns to the login page`
 			return msg
 		}
 
+		broadcastRoom(s, c.Room, serverMessage(fmt.Sprintf("%s is now called %s.", c.Name, name)), c.id)
+
 		c.Name = name
 		return fmt.Sprintf("Your name has been changed to %s!", name)
 	}
