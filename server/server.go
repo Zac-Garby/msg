@@ -42,10 +42,7 @@ func New() *Server {
 func (s *Server) NewClient(conn *websocket.Conn) error {
 	defer conn.Close()
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		return err
-	}
+	id := uuid.NewV4()
 
 	s.clients[id] = &client{
 		id:       id,
