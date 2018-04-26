@@ -39,6 +39,8 @@ func main() {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "max-age=0")
+
 	if name, err := r.Cookie("name"); err == nil && name.Value != "" {
 		http.ServeFile(w, r, "static/messager.html")
 	} else {

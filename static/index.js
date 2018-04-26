@@ -7,7 +7,7 @@ function login() {
 			document.cookie = `name=${name}`
 			document.cookie = `room=${room}`
 	
-			location.reload()
+			location.reload(true)
 		} else {
 			var err = document.getElementById("error")
 			err.innerHTML = reason
