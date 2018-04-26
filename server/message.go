@@ -1,5 +1,9 @@
 package server
 
+import (
+	uuid "github.com/satori/go.uuid"
+)
+
 type message struct {
 	Type   string      `json:"type"`
 	Data   interface{} `json:"data"`
@@ -12,10 +16,17 @@ func broadcast(s *Server, m *message) {
 	}
 }
 
-func broadcastRoom(s *Server, room string, m *message) {
+func broadcastRoom(s *Server, room string, m *message, blacklist ...uuid.UUID) {
+outer:
 	for _, client := range s.clients {
 		if client.Room != room {
 			continue
+		}
+
+		for _, i := range blacklist {
+			if i == client.id {
+				continue outer
+			}
 		}
 
 		client.send(m)
