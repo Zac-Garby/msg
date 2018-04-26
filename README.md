@@ -29,6 +29,8 @@ There are still a number of things that need doing:
   - Muting other users
   - Limiting amount of messages per minute
   - Improve styles on phones
+  - Permalinks for rooms
+    - `/room/[name]`
   - Host it somewhere
   - Maybe rewrite backend -- split it into two parts:
     - One package to actually do stuff
