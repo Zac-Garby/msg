@@ -6,10 +6,12 @@
 
 html, body {
 	font-family: monospace;
+	background-color: black;
+	color: lime;
 }
 
 ul#chat-log {
-	border-bottom: 1px solid black;
+	border-bottom: 1px solid lime;
 	padding-left: 0;
 	display: block;
 	width: 100vw;
@@ -20,7 +22,7 @@ ul#chat-log {
 
 ul#chat-log li {
 	padding: 10px;
-	border-bottom: 1px solid #afafaf;
+	border-bottom: 1px solid #0EBB0D;
 }
 
 ul#chat-log li pre {
@@ -35,8 +37,9 @@ ul#chat-log li .username {
 }
 
 ul#chat-log li.server-msg {
-	background-color: #ddddff;
-	color: #000055;
+	background-color: black;
+	border-left: 5px solid lime;
+	color: lime;
 }
 
 textarea#input {
@@ -47,11 +50,12 @@ textarea#input {
 	border: none;
 	resize: none;
 	padding-right: 70px;
-	background-color: #aaaaff3f;
+	background-color: black;
+	color: lime;
 }
 
 textarea#input::placeholder {
-	color: #0000aa;
+	color: #00aa00;
 }
 
 button#send-msg {
@@ -61,14 +65,14 @@ button#send-msg {
 	height: 50px;
 	width: 50px;
 	border-radius: 5px;
-	border: 1px solid #0000aa;
-	background-color: #0000ff2c;
-	color: #0000cc;
+	border: 2px solid #00aa00;
+	background-color: black;
+	color: #00cc00;
 	cursor: pointer;
 }
 
 button#send-msg:active {
-	background-color: #0000ff5c;
+	background-color: #00ff005c;
 }
 
 div.center {
