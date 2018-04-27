@@ -59,7 +59,8 @@ func (s *Server) NewClient(conn *websocket.Conn) error {
 
 		if err := conn.ReadJSON(msg); err != nil {
 			if strings.Contains(err.Error(), "use of closed network") ||
-				strings.Contains(err.Error(), "unexpected EOF") {
+				strings.Contains(err.Error(), "unexpected EOF") ||
+				strings.Contains(err.Error(), "going away") {
 				break
 			}
 
