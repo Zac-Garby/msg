@@ -4,31 +4,31 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-type message struct {
+type Message struct {
 	Type   string      `json:"type"`
 	Data   interface{} `json:"data"`
-	sender *client
+	sender Client
 }
 
-func broadcast(s *Server, m *message) {
+func broadcast(s *Server, m *Message) {
 	for _, client := range s.clients {
-		client.send(m)
+		client.Send(m)
 	}
 }
 
-func broadcastRoom(s *Server, room string, m *message, blacklist ...uuid.UUID) {
+func broadcastRoom(s *Server, room string, m *Message, blacklist ...uuid.UUID) {
 outer:
 	for _, client := range s.clients {
-		if client.Room != room {
+		if client.RoomName() != room {
 			continue
 		}
 
 		for _, i := range blacklist {
-			if i == client.id {
+			if i == client.ID() {
 				continue outer
 			}
 		}
 
-		client.send(m)
+		client.Send(m)
 	}
 }

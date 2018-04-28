@@ -25,15 +25,15 @@ var (
 // A Server is a websocket server which handles
 // websocket connections from clients.
 type Server struct {
-	messages chan *message
-	clients  map[uuid.UUID]*client
+	messages chan *Message
+	clients  map[uuid.UUID]Client
 }
 
 // New creates a new server.
 func New() *Server {
 	s := &Server{
-		messages: make(chan *message, 1),
-		clients:  make(map[uuid.UUID]*client),
+		messages: make(chan *Message, 1),
+		clients:  make(map[uuid.UUID]Client),
 	}
 
 	return s
@@ -53,7 +53,7 @@ func (s *Server) NewClient(conn *websocket.Conn) error {
 	client := s.clients[id]
 
 	for {
-		msg := &message{
+		msg := &Message{
 			sender: client,
 		}
 
@@ -71,8 +71,8 @@ func (s *Server) NewClient(conn *websocket.Conn) error {
 		s.messages <- msg
 	}
 
-	if client.sentInfo {
-		broadcast(s, serverMessage(fmt.Sprintf("%s has left the server", client.Name)))
+	if client.SentInfo() {
+		broadcast(s, serverMessage(fmt.Sprintf("%s has left the server", client.Username())))
 	}
 
 	delete(s.clients, id)
@@ -100,7 +100,7 @@ func (s *Server) HandleMessages() {
 
 				if reason, ok := ValidateName(name, s); !ok {
 					out := serverMessage(fmt.Sprintf("Your username is invalid (%s)", reason))
-					if err := msg.sender.send(out); err != nil {
+					if err := msg.sender.Send(out); err != nil {
 						log.Println("error when sending invalid username msg:", err)
 					}
 
@@ -109,22 +109,22 @@ func (s *Server) HandleMessages() {
 
 				if reason, ok := ValidateRoom(room); !ok {
 					out := serverMessage(fmt.Sprintf("Your room name is invalid (%s)", reason))
-					if err := msg.sender.send(out); err != nil {
+					if err := msg.sender.Send(out); err != nil {
 						log.Println("error when sending invalid room msg:", err)
 					}
 
 					break
 				}
 
-				msg.sender.Name = name
-				msg.sender.Room = room
-				msg.sender.sentInfo = true
+				msg.sender.Rename(name)
+				msg.sender.GotoRoom(room)
+				msg.sender.InfoReceived()
 
 				out := serverMessage(fmt.Sprintf(`Hello - welcome to the server, %s.
 Type 'help' to view the available commands.
 You can go to another room using the '/room [room-name]' command.`, name))
 
-				if err := msg.sender.send(out); err != nil {
+				if err := msg.sender.Send(out); err != nil {
 					log.Println("error when sending welcome msg:", err)
 				}
 
@@ -132,19 +132,19 @@ You can go to another room using the '/room [room-name]' command.`, name))
 			}
 
 		case "chat":
-			if !msg.sender.sentInfo {
+			if !msg.sender.SentInfo() {
 				log.Println("a client tried to send a message, but hadn't sent client info beforehand")
 				break
 			}
 
 			str, ok := msg.Data.(string)
 			if !ok {
-				log.Println("client", msg.sender.id, "tried to send a non-string message")
+				log.Println("client", msg.sender.ID(), "tried to send a non-string message")
 				break
 			}
 
 			if len(str) < 1 || len(str) > maxMessageLength {
-				msg.sender.send(serverMessage(
+				msg.sender.Send(serverMessage(
 					fmt.Sprintf("Your message must be at least one character and less than %d characters", maxMessageLength),
 				))
 				break
@@ -171,7 +171,7 @@ You can go to another room using the '/room [room-name]' command.`, name))
 				break
 			}
 
-			broadcastRoom(s, msg.sender.Room, &message{
+			broadcastRoom(s, msg.sender.RoomName(), &Message{
 				Type: "chat",
 				Data: map[string]interface{}{
 					"sender": msg.sender,
@@ -186,7 +186,7 @@ You can go to another room using the '/room [room-name]' command.`, name))
 // given name
 func (s *Server) checkName(name string) bool {
 	for _, c := range s.clients {
-		if c.Name == name {
+		if c.Username() == name {
 			return true
 		}
 	}
@@ -200,15 +200,15 @@ func (s *Server) usersInRoom(room string) []string {
 	var names []string
 
 	for _, c := range s.clients {
-		if c.Room == room {
-			names = append(names, c.Name)
+		if c.RoomName() == room {
+			names = append(names, c.Username())
 		}
 	}
 
 	return names
 }
 
-func (s *Server) handleCommand(sender *client, str string) {
+func (s *Server) handleCommand(sender Client, str string) {
 	var (
 		out   string
 		split = strings.Fields(str)
@@ -231,13 +231,13 @@ func (s *Server) handleCommand(sender *client, str string) {
 		return
 	}
 
-	if err := sender.send(serverMessage(out)); err != nil {
+	if err := sender.Send(serverMessage(out)); err != nil {
 		log.Println("handleCommand: errored when sending output message")
 	}
 }
 
-func serverMessage(content string) *message {
-	return &message{
+func serverMessage(content string) *Message {
+	return &Message{
 		Type: "server-msg",
 		Data: content,
 	}
