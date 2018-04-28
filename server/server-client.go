@@ -47,7 +47,7 @@ func (s *serverClient) Send(m *Message) error {
 		fmt.Printf("[%s] %s\n", sender.Username(), text)
 
 	case "server-msg":
-		fmt.Println("[server]", m.Data)
+		fmt.Println("~~~", m.Data)
 
 	case "quit":
 		fmt.Println("cannot quit using /quit. use ctrl+c instead")
