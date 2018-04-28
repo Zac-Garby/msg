@@ -29,17 +29,7 @@ There are still a number of things that need doing:
   - Muting other users
   - Limiting amount of messages per minute
   - Improve styles on phones
+  - Regularly ping the server to check connection
   - Permalinks for rooms
     - `/room/[name]`
   - Host it somewhere
-  - Maybe rewrite backend -- split it into two parts:
-    - One package to actually do stuff
-	  - Handling commands
-	  - Keeping track of users
-    - Another package - a web server - to act as a proxy
-	  between the backend and the frontend
-	  - Keeps track of websockets
-	  - Serves the website's pages
-	  - Maybe even some routes for an API
-	    - e.g. `/users?room=x` lists users in a room
-    - This would make it much more extensible
