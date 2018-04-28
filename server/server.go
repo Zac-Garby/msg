@@ -1,8 +1,11 @@
 package server
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 
@@ -27,6 +30,7 @@ var (
 type Server struct {
 	messages chan *Message
 	clients  map[uuid.UUID]Client
+	client   Client
 }
 
 // New creates a new server.
@@ -50,6 +54,7 @@ func (s *Server) addServerClient() {
 	}
 
 	s.clients[sc.id] = sc
+	s.client = sc
 }
 
 func (s *Server) NewClient(conn *websocket.Conn) error {
@@ -91,6 +96,21 @@ func (s *Server) NewClient(conn *websocket.Conn) error {
 	delete(s.clients, id)
 
 	return nil
+}
+
+func (s *Server) HandleInput(r io.Reader) {
+	br := bufio.NewReader(r)
+
+	for {
+		line, err := br.ReadString('\n')
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			break
+		}
+
+		line = strings.TrimSpace(line)
+		s.handleChat(line, s.client)
+	}
 }
 
 func (s *Server) HandleMessages() {
@@ -156,43 +176,48 @@ You can go to another room using the '/room [room-name]' command.`, name))
 				break
 			}
 
-			if len(str) < 1 || len(str) > maxMessageLength {
-				msg.sender.Send(serverMessage(
-					fmt.Sprintf("Your message must be at least one character and less than %d characters", maxMessageLength),
-				))
-				break
-			}
-
-			if strings.HasPrefix(str, "/script") {
-				lines := strings.Split(str, "\n")
-
-				if len(lines) <= 1 {
-					break
-				}
-
-				lines = lines[1:]
-
-				for _, line := range lines {
-					s.handleCommand(msg.sender, line)
-				}
-
-				break
-			}
-
-			if str[0] == '/' {
-				s.handleCommand(msg.sender, str[1:])
-				break
-			}
-
-			broadcastRoom(s, msg.sender.RoomName(), &Message{
-				Type: "chat",
-				Data: map[string]interface{}{
-					"sender": msg.sender,
-					"text":   str,
-				},
-			})
+			s.handleChat(str, msg.sender)
 		}
 	}
+}
+
+// handleChat handles a chat message
+func (s *Server) handleChat(msg string, sender Client) {
+	if len(msg) < 1 || len(msg) > maxMessageLength {
+		sender.Send(serverMessage(
+			fmt.Sprintf("Your message must be between 1 and %d characters", maxMessageLength),
+		))
+		return
+	}
+
+	if strings.HasPrefix(msg, "/script") {
+		lines := strings.Split(msg, "\n")
+
+		if len(lines) <= 1 {
+			return
+		}
+
+		lines = lines[1:]
+
+		for _, line := range lines {
+			s.handleCommand(sender, line)
+		}
+
+		return
+	}
+
+	if msg[0] == '/' {
+		s.handleCommand(sender, msg[1:])
+		return
+	}
+
+	broadcastRoom(s, sender.RoomName(), &Message{
+		Type: "chat",
+		Data: map[string]interface{}{
+			"sender": sender,
+			"text":   msg,
+		},
+	})
 }
 
 // checkName checks if a client exists with a

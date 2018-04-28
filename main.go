@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Zac-Garby/msg/server"
 	"github.com/gorilla/mux"
@@ -20,6 +21,7 @@ var s *server.Server
 func main() {
 	s = server.New()
 	go s.HandleMessages()
+	go s.HandleInput(os.Stdin)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", indexHandler)
