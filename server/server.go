@@ -36,7 +36,20 @@ func New() *Server {
 		clients:  make(map[uuid.UUID]Client),
 	}
 
+	s.addServerClient()
+
 	return s
+}
+
+func (s *Server) addServerClient() {
+	sc := &serverClient{
+		server: s,
+		id:     uuid.NewV4(),
+		Room:   "/",
+		Name:   "*server*",
+	}
+
+	s.clients[sc.id] = sc
 }
 
 func (s *Server) NewClient(conn *websocket.Conn) error {
