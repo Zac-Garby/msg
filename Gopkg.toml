@@ -10,6 +10,10 @@
   name = "github.com/satori/go.uuid"
   version = "1.2.0"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/GeertJohan/go.rice"
+
 [prune]
   go-tests = true
   unused-packages = true

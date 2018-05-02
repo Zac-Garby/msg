@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/Zac-Garby/msg/server"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -31,11 +33,11 @@ func main() {
 
 	r.PathPrefix("/static/").Handler(
 		http.StripPrefix("/static/",
-			http.FileServer(http.Dir("./static/")),
+			http.FileServer(rice.MustFindBox("./static/").HTTPBox()),
 		),
 	)
 
-	r.Handle("/favicon.ico", http.FileServer(http.Dir("./static/")))
+	r.Handle("/favicon.ico", http.FileServer(rice.MustFindBox("./static/").HTTPBox()))
 
 	fmt.Println("listening on localhost:3000")
 	http.ListenAndServe(":3000", r)
@@ -44,10 +46,20 @@ func main() {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "max-age=0")
 
+	box := rice.MustFindBox("./static/").HTTPBox()
+
 	if name, err := r.Cookie("name"); err == nil && name.Value != "" {
-		http.ServeFile(w, r, "static/messager.html")
+		f, err := box.Open("messager.html")
+		if err != nil {
+			http.Error(w, "couldn't open messager.html", http.StatusInternalServerError)
+		}
+		http.ServeContent(w, r, "messager.html", time.Time{}, f)
 	} else {
-		http.ServeFile(w, r, "static/index.html")
+		f, err := box.Open("index.html")
+		if err != nil {
+			http.Error(w, "couldn't open index.html", http.StatusInternalServerError)
+		}
+		http.ServeContent(w, r, "index.html", time.Time{}, f)
 	}
 }
 
