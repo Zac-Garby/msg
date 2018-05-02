@@ -36,6 +36,4 @@ There are still a number of things that need doing:
   - Limiting amount of messages per minute
   - Improve styles on phones
   - Regularly ping the server to check connection
-  - Permalinks for rooms
-    - `/room/[name]`
   - Host it somewhere
