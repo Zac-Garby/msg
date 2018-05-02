@@ -25,6 +25,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", indexHandler)
+	r.HandleFunc(`/room/{room:[\p{L}\p{N}-_./<>&]{1,64}}`, roomHandler)
 	r.HandleFunc("/ws", websocketHandler)
 	r.HandleFunc("/validate", validateHandler)
 
@@ -48,6 +49,20 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.ServeFile(w, r, "static/index.html")
 	}
+}
+
+func roomHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "max-age=0")
+	room := mux.Vars(r)["room"]
+
+	http.SetCookie(w, &http.Cookie{
+		Name:   "room",
+		Value:  room,
+		Path:   "/",
+		MaxAge: 30, // expires in 30s, since it's only used briefly
+	})
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func websocketHandler(w http.ResponseWriter, r *http.Request) {

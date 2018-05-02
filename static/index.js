@@ -28,3 +28,14 @@ function validate(name, room, callback) {
 	req.open("GET", url, true)
 	req.send()
 }
+
+function getCookie(name) {
+	var value = "; " + document.cookie
+	var parts = value.split("; " + name + "=")
+	if (parts.length == 2) return parts.pop().split(";").shift()
+}
+
+var room = getCookie("room")
+if (room) {
+	document.getElementById("room").value = room
+}
