@@ -25,7 +25,13 @@ There are still a number of things that need doing:
   - Admins
     - Since user's aren't really a thing, there would
 	  need to be some other system
+  - Instead of global admins, maybe:
+    - When joining a new room (one which nobody's been to before,) you become the admin
+	  of that room
+	- This gives you commands such as `/kick`, `/promote`, etc...
+	- Would still need a user system
   - Back up messages to a database (probably Redis)
+    - Actually, maybe just a log file
   - Muting other users
   - Limiting amount of messages per minute
   - Improve styles on phones
