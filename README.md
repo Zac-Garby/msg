@@ -37,3 +37,4 @@ There are still a number of things that need doing:
   - Improve styles on phones
   - Regularly ping the server to check connection
   - Host it somewhere
+  - Plugins, written in some language (maybe Lua)
